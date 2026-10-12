@@ -1,7 +1,7 @@
 <template>
   <div>
     <HostelsHeader />
-    <HostelsFilters />
+    <!-- <HostelsFilters /> -->
     <HostelsGrid />
     <HostelsHowItWorks />
   </div>

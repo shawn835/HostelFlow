@@ -18,7 +18,7 @@
         </div>
 
         <!-- Availability Summary Badge -->
-        <div class="summary-badge-card">
+        <!-- <div class="summary-badge-card">
           <div class="summary-icon-wrapper">
             <Icon name="lucide:building-2" size="22" />
           </div>
@@ -28,7 +28,7 @@
               <span class="live-dot"></span> Live verified inventory
             </span>
           </div>
-        </div>
+        </div> -->
       </div>
     </div>
   </div>

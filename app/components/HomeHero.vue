@@ -35,12 +35,12 @@
         <!-- Quick Proof Metrics -->
         <div class="hero-metrics-grid">
           <div class="metric-item">
-            <span class="metric-num">1,240+</span>
+            <span class="metric-num">{{ stats.housedStudents }}+</span>
             <span class="metric-label">Housed Students</span>
           </div>
           <div class="metric-divider"></div>
           <div class="metric-item">
-            <span class="metric-num">480</span>
+            <span class="metric-num">{{ stats.totalBeds }}</span>
             <span class="metric-label">Total Beds</span>
           </div>
           <div class="metric-divider"></div>
@@ -294,6 +294,10 @@ const { useGetBooking } = useBooking();
 const { data: response, pending, error, refresh } = await useGetBooking();
 
 const booking = computed(() => response.value?.booking ?? null);
+
+const { data: heroStats } = await useFetch("/api/hostels/stats");
+
+const stats = computed(() => heroStats.value?.stats);
 </script>
 
 <style scoped>

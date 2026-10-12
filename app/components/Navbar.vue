@@ -70,9 +70,6 @@
             <Icon name="lucide:chevron-down" class="chevron-icon" />
           </NuxtLink>
         </template>
-        <!-- <template v-else>
-          <NuxtLink to="/login" class="btn-primary"> Profile </NuxtLink>
-        </template> -->
       </div>
 
       <!-- Hamburger Menu Toggle Button (Mobile) -->
