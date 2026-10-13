@@ -15,7 +15,6 @@
         <NuxtLink v-if="user" to="/bookings" class="nav-link" @click="closeMenu"
           >My Booking</NuxtLink
         >
-        <!-- <NuxtLink to="/help" class="nav-link" @click="closeMenu">Help</NuxtLink> -->
 
         <!-- Mobile-only Auth Section -->
         <div class="mobile-auth-section">
@@ -96,11 +95,12 @@ const closeMenu = () => {
 
 <style scoped>
 .navbar {
-  background-color: var(--color-white);
-  border-bottom: 1px solid var(--color-border);
   position: sticky;
   top: 0;
-  z-index: 1000;
+  z-index: 100;
+  background-color: var(--color-white);
+  border-bottom: 1px solid var(--color-border);
+  box-shadow: 0 1px 3px 0 rgba(15, 23, 42, 0.02);
   width: 100%;
 }
 
@@ -108,27 +108,31 @@ const closeMenu = () => {
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 1.5rem;
-  height: 70px;
+  height: 72px;
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
 
+/* Brand / Logo */
 .nav-brand {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.625rem;
   font-size: 1.25rem;
-  font-weight: 700;
+  font-weight: 800;
   color: var(--color-navy);
   text-decoration: none;
+  letter-spacing: -0.02em;
 }
 
 .brand-icon {
   color: var(--color-primary);
-  font-size: 1.5rem;
+  width: 24px;
+  height: 24px;
 }
 
+/* Desktop Navigation Links */
 .nav-links {
   display: flex;
   align-items: center;
@@ -136,9 +140,10 @@ const closeMenu = () => {
 }
 
 .nav-link {
-  color: var(--color-navy);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
   text-decoration: none;
-  font-weight: 500;
   transition: color 0.2s ease;
 }
 
@@ -147,23 +152,36 @@ const closeMenu = () => {
   color: var(--color-primary);
 }
 
-.profile-pill {
+/* Mobile-only sections hidden on desktop */
+.mobile-auth-section {
+  display: none;
+}
+
+/* Desktop Auth / Profile & Admin Section */
+.desktop-auth-section {
   display: flex;
   align-items: center;
+  gap: 1rem;
+}
+
+.profile-pill {
+  display: inline-flex;
+  align-items: center;
   gap: 0.5rem;
-  padding: 0.5rem 0.875rem;
   background-color: var(--color-bg-light);
   border: 1px solid var(--color-border);
+  padding: 0.5rem 0.875rem;
   border-radius: 9999px;
   color: var(--color-navy);
+  font-size: 0.875rem;
+  font-weight: 700;
   text-decoration: none;
-  font-weight: 500;
   transition: all 0.2s ease;
 }
 
 .profile-pill:hover {
   border-color: var(--color-primary);
-  color: var(--color-primary);
+  background-color: var(--color-white);
 }
 
 .profile-icon {
@@ -171,69 +189,82 @@ const closeMenu = () => {
 }
 
 .chevron-icon {
-  font-size: 0.875rem;
   color: var(--color-text-muted);
+  width: 14px;
+  height: 14px;
 }
 
-.btn-primary {
+/* Primary Outline Button for Login */
+.btn-primary-outline {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: transparent;
+  border: 1px solid var(--color-primary);
+  color: var(--color-primary);
+  padding: 0.625rem 1.25rem;
+  border-radius: 0.625rem;
+  font-size: 0.875rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.btn-primary-outline:hover {
   background-color: var(--color-primary);
   color: var(--color-white);
-  padding: 0.5rem 1.25rem;
-  border-radius: 0.375rem;
-  text-decoration: none;
-  font-weight: 500;
-  transition: opacity 0.2s ease;
 }
 
-.btn-primary:hover {
-  opacity: 0.9;
-}
-
-.mobile-auth-section {
-  display: none;
-}
-
+/* Mobile Menu Toggle Button */
 .menu-toggle {
   display: none;
   background: none;
   border: none;
-  cursor: pointer;
   color: var(--color-navy);
+  cursor: pointer;
+  padding: 0.5rem;
 }
 
+/* Responsive Styles for Mobile */
 @media (max-width: 768px) {
+  .menu-toggle {
+    display: block;
+  }
+
   .desktop-auth-section {
     display: none;
   }
 
-  .menu-toggle {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
   .nav-links {
-    display: none;
     position: absolute;
-    top: 70px;
+    top: 72px;
     left: 0;
-    width: 100%;
+    right: 0;
     background-color: var(--color-white);
+    border-bottom: 1px solid var(--color-border);
     flex-direction: column;
-    align-items: flex-start;
+    align-items: stretch;
     padding: 1.5rem;
     gap: 1.25rem;
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
-    border-bottom: 1px solid var(--color-border);
+    box-shadow: 0 10px 15px -3px rgba(15, 23, 42, 0.05);
+    display: none; /* Hidden by default */
   }
 
   .nav-links.nav-open {
     display: flex;
   }
 
+  .nav-link {
+    font-size: 1rem;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #f1f5f9;
+  }
+
   .mobile-auth-section {
-    display: block;
-    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-top: 0.5rem;
     padding-top: 1rem;
     border-top: 1px solid var(--color-border);
   }
@@ -241,7 +272,8 @@ const closeMenu = () => {
   .mobile-profile-link {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: 0.75rem;
+    border-bottom: none !important;
   }
 }
 </style>

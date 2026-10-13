@@ -277,7 +277,9 @@ const reserveRoom = async () => {
     await navigateTo("/bookings");
   } catch (err) {
     $toast.error(
-      err.statusMessage || "Failed to reserve bed. Please try again",
+      err?.data?.statusMessage ||
+        err?.statusMessage ||
+        "Failed to reserve bed. Please try again",
     );
   }
 };
