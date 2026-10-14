@@ -185,38 +185,33 @@ export const getPublicHostels = async () => {
   return result.rows;
 };
 
-export const getPublicHostelDetails = async (hostelId) => {
+export const getPublicHostelDetails = async (hostelId, page = 1) => {
+  const limit = 10;
+  const offset = (page - 1) * limit;
+
   const query = `
     WITH room_stats AS (
       SELECT
         r.id,
         r.hostel_id,
         r.room_number,
-
         COUNT(DISTINCT b.id)::int AS "totalBeds",
-
         COUNT(
           DISTINCT CASE
             WHEN bk.status = 'confirmed' THEN b.id
           END
         )::int AS "occupiedBeds"
-
       FROM rooms r
-
       LEFT JOIN beds b
         ON b.room_id = r.id
-
       LEFT JOIN hostel_bookings bk
         ON bk.bed_id = b.id
-
       WHERE r.hostel_id = $1
-
       GROUP BY
         r.id,
         r.hostel_id,
         r.room_number
     ),
-
     hostel_stats AS (
       SELECT
         h.id,
@@ -224,33 +219,31 @@ export const getPublicHostelDetails = async (hostelId) => {
         h.gender,
         h.price,
         h.image,
-
         COUNT(rs.id)::int AS "totalRooms",
-
-        COALESCE(
-          SUM(rs."totalBeds"), 0
-        )::int AS "totalBeds",
-
-        COALESCE(
-          SUM(rs."occupiedBeds"), 0
-        )::int AS "occupiedBeds"
-
+        COALESCE(SUM(rs."totalBeds"), 0)::int AS "totalBeds",
+        COALESCE(SUM(rs."occupiedBeds"), 0)::int AS "occupiedBeds"
       FROM hostels h
-
       LEFT JOIN room_stats rs
         ON rs.hostel_id = h.id
-
       WHERE h.id = $1
         AND h.active = TRUE
-
       GROUP BY
         h.id,
         h.name,
         h.gender,
         h.price,
         h.image
+    ),
+    paginated_rooms AS (
+      SELECT
+        rs.id,
+        rs.room_number,
+        rs."totalBeds",
+        rs."occupiedBeds"
+      FROM room_stats rs
+      ORDER BY rs.room_number
+      LIMIT $2 OFFSET $3
     )
-
     SELECT
       hs.id,
       hs.name,
@@ -258,33 +251,30 @@ export const getPublicHostelDetails = async (hostelId) => {
       hs.price,
       hs."totalRooms",
       hs."totalBeds",
-
-      hs."totalBeds" - hs."occupiedBeds"
-        AS "bedsAvailable",
-
+      hs."totalBeds" - hs."occupiedBeds" AS "bedsAvailable",
       hs.image,
-
       COALESCE(
         (
           SELECT json_agg(
             json_build_object(
-              'id', rs.id,
-              'number', rs.room_number,
-              'totalBeds', rs."totalBeds",
+              'id', pr.id,
+              'number', pr.room_number,
+              'totalBeds', pr."totalBeds",
               'available',
-                rs."totalBeds" - rs."occupiedBeds"
+                pr."totalBeds" - pr."occupiedBeds"
             )
-            ORDER BY rs.room_number
+            ORDER BY pr.room_number
           )
-          FROM room_stats rs
+          FROM paginated_rooms pr
         ),
-        '[]'
-      ) AS rooms
-
+        '[]'::json
+      ) AS rooms,
+      $4::int AS "perPage",
+      CEIL(hs."totalRooms"::numeric / $4)::int AS "totalPages"
     FROM hostel_stats hs;
   `;
 
-  const result = await pool.query(query, [hostelId]);
+  const result = await pool.query(query, [hostelId, limit, offset, limit]);
 
   return result.rows[0] ?? null;
 };

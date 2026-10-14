@@ -1,5 +1,9 @@
+<template>
+  <HomeHero />
+</template>
+
 <script setup>
 definePageMeta({
-  middleware: () => navigateTo("/", { replace: true }),
+  middleware: "guest",
 });
 </script>

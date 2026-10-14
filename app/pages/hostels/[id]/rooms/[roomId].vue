@@ -189,6 +189,7 @@ import { useRoute, useRouter } from "vue-router";
 
 const route = useRoute();
 const router = useRouter();
+const user = useState("user", () => null);
 
 const hostelId = route.params.id;
 const roomId = route.params.roomId;
@@ -265,6 +266,15 @@ const getBedStatusLabel = (bed) => {
 
 //reserving
 const reserveRoom = async () => {
+  if (!user.value) {
+    $toast.success("please login first to reserve a bed");
+    await navigateTo({
+      path: "/login",
+      query: { redirect: route.fullPath },
+    });
+    return;
+  }
+
   if (!selectedBed.value) {
     $toast.error("Please select a bed to reserve.");
     return;

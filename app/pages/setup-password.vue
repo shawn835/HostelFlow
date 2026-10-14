@@ -38,7 +38,9 @@
 
 <script setup>
 import { ref } from "vue";
+import { getSafeRedirect } from "../utils/authRedirect.js";
 
+const route = useRoute();
 const { $toast } = useNuxtApp();
 const user = useState("user", () => null);
 const isSubmitting = ref(false);
@@ -60,7 +62,7 @@ const handlePasswordSetup = async ({ password, confirmPassword }) => {
     });
 
     user.value = response.user;
-    await navigateTo("/bookings");
+    await navigateTo(getSafeRedirect(route.query.redirect) || "/bookings");
     $toast.success("password created successfully");
   } catch (error) {
     feedbackType.value = "error";

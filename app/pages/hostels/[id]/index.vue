@@ -1,5 +1,9 @@
 <template>
-  <LoadingSpinner fullScreen text="loading hostel data..." v-if="loading" />
+  <LoadingSpinner
+    v-if="loading && !hostel"
+    fullScreen
+    text="Loading hostel data..."
+  />
   <div v-else-if="error" class="hostel-detail-page">
     <div class="container">
       <p>
@@ -81,71 +85,95 @@
           <span class="rooms-hint">Select a room to view available beds</span>
         </div>
 
-        <div class="rooms-list">
-          <div v-for="room in hostel.rooms" :key="room.number" class="room-row">
-            <div class="room-info">
-              <span class="room-number">{{ room.number }}</span>
-              <span class="room-meta">{{ room.totalBeds }} beds</span>
-            </div>
+        <div class="rooms-list-wrapper">
+          <div class="rooms-list" :class="{ 'rooms-loading': loading }">
+            <div v-for="room in hostel.rooms" :key="room.id" class="room-row">
+              <div class="room-info">
+                <span class="room-number">{{ room.number }}</span>
+                <span class="room-meta">{{ room.totalBeds }} beds</span>
+              </div>
 
-            <div class="room-status-wrapper">
-              <span
-                class="room-availability"
-                :class="room.available > 0 ? 'text-success' : 'text-danger'"
-              >
-                <Icon
-                  :name="
-                    room.available > 0
-                      ? 'lucide:check-circle'
-                      : 'lucide:x-circle'
-                  "
-                  size="14"
-                />
-                {{ room.available }} available
-              </span>
+              <div class="room-status-wrapper">
+                <span
+                  class="room-availability"
+                  :class="room.available > 0 ? 'text-success' : 'text-danger'"
+                >
+                  <Icon
+                    :name="
+                      room.available > 0
+                        ? 'lucide:check-circle'
+                        : 'lucide:x-circle'
+                    "
+                    size="14"
+                  />
+                  {{ room.available }} available
+                </span>
 
-              <template v-if="room.available > 0">
-                <button @click="viewBeds(room.id)" class="btn-view-beds">
-                  view bed
-                  <Icon name="lucide:arrow-right" size="14" />
-                </button>
-              </template>
-              <template v-else>
-                <span class="badge-full">Full</span>
-              </template>
+                <template v-if="room.available > 0">
+                  <button @click="viewBeds(room.id)" class="btn-view-beds">
+                    view bed
+                    <Icon name="lucide:arrow-right" size="14" />
+                  </button>
+                </template>
+
+                <template v-else>
+                  <span class="badge-full">Full</span>
+                </template>
+              </div>
             </div>
+          </div>
+
+          <div v-if="loading && hostel" class="rooms-loading-overlay">
+            <LoadingSpinner text="Loading rooms..." />
           </div>
         </div>
       </div>
     </div>
   </div>
+
+  <Pagination
+    :totalItems="total"
+    :itemsPerPage="itemsPerPage"
+    :totalPages="totalPages"
+    v-model:currentPage="currentPage"
+  />
 </template>
 
 <script setup>
+import { watch } from "vue";
 import { useRoute } from "vue-router";
 
 const route = useRoute();
-
 const hostelId = route.params.id;
 
 const { getPublicHostelDetails, loading } = useHostels();
 
 const hostel = ref(null);
 const error = ref(null);
+const total = ref(0);
+const totalPages = ref(0);
+const currentPage = ref(1);
+const itemsPerPage = ref(10);
 
 const loadHostel = async () => {
   error.value = null;
 
   try {
-    const response = await getPublicHostelDetails(hostelId);
+    const response = await getPublicHostelDetails(hostelId, currentPage.value);
 
-    hostel.value = response.hostel;
+    hostel.value = response.data;
+    total.value = response.data.totalRooms;
+    totalPages.value = response.data.totalPages;
+    itemsPerPage.value = response.data.perPage;
   } catch (err) {
     error.value = err;
   }
 };
 
-await loadHostel();
+// Fetch whenever the page changes.
+watch(currentPage, () => {
+  loadHostel();
+});
 
 const getGenderClass = (gender) => {
   if (gender === "Boys") return "badge-boys";
@@ -157,6 +185,9 @@ const getGenderClass = (gender) => {
 const viewBeds = (roomId) => {
   navigateTo(`/hostels/${hostel.value.id}/rooms/${roomId}`);
 };
+
+// Initial fetch.
+await loadHostel();
 </script>
 
 <style scoped>
@@ -417,6 +448,27 @@ const viewBeds = (roomId) => {
   padding: 0.375rem 0.875rem;
   border-radius: 0.5rem;
   border: 1px solid var(--color-border);
+}
+
+.rooms-list-wrapper {
+  position: relative;
+  min-height: 120px;
+}
+
+.rooms-loading {
+  opacity: 0.4;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+
+.rooms-loading-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgb(255 255 255 / 65%);
+  z-index: 2;
 }
 
 /* Responsive adjustments */

@@ -189,7 +189,9 @@
 
 <script setup>
 import { computed, ref } from "vue";
+import { getSafeRedirect } from "../utils/authRedirect.js";
 
+const route = useRoute();
 const currentStep = ref("admission");
 const admissionNumber = ref("");
 const verifiedAdmission = ref("");
@@ -232,7 +234,12 @@ const handleAdmissionSubmit = async () => {
     }
 
     if (response.next === "setup-password") {
-      await navigateTo("/setup-password");
+      const redirect = getSafeRedirect(route.query.redirect);
+      await navigateTo(
+        redirect
+          ? { path: "/setup-password", query: { redirect } }
+          : "/setup-password",
+      );
       return;
     }
 
@@ -261,7 +268,7 @@ const handleLoginSubmit = async ({ password }) => {
 
     $toast.success(response.message);
     authChecked.value = false;
-    await navigateTo("/bookings");
+    await navigateTo(getSafeRedirect(route.query.redirect) || "/bookings");
   } catch (error) {
     $toast.error(
       error?.data?.statusMessage || "Unable to log in. Please try again.",

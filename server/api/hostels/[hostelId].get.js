@@ -1,16 +1,24 @@
 import * as hostelRepository from "../../repositories/hostel.repository.js";
 
 export default defineEventHandler(async (event) => {
-  const hostelId = getRouterParam(event, "hostelId");
+  const hostelId = Number(getRouterParam(event, "hostelId"));
+  const query = getQuery(event);
 
-  if (!hostelId) {
+  const page = Number(query.page ?? 1);
+
+  if (
+    !Number.isInteger(hostelId) ||
+    hostelId <= 0 ||
+    !Number.isInteger(page) ||
+    page < 1
+  ) {
     throw createError({
       statusCode: 400,
-      statusMessage: "Hostel ID is required",
+      statusMessage: "Invalid hostel ID or page number",
     });
   }
 
-  const hostel = await hostelRepository.getPublicHostelDetails(hostelId);
+  const hostel = await hostelRepository.getPublicHostelDetails(hostelId, page);
 
   if (!hostel) {
     throw createError({
@@ -21,6 +29,6 @@ export default defineEventHandler(async (event) => {
 
   return {
     success: true,
-    hostel,
+    data: hostel,
   };
 });

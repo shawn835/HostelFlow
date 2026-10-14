@@ -103,11 +103,15 @@ export const useHostels = () => {
     });
   };
 
-  const getPublicHostelDetails = async (hostelId) => {
+  const getPublicHostelDetails = async (hostelId, page = 1) => {
     loading.value = true;
 
     try {
-      return await $fetch(`/api/hostels/${hostelId}`);
+      return await $fetch(`/api/hostels/${hostelId}`, {
+        query: {
+          page,
+        },
+      });
     } finally {
       loading.value = false;
     }
