@@ -31,7 +31,7 @@
             :type="showPassword ? 'text' : 'password'"
             v-model="password"
             :placeholder="
-              confirm ? 'At least 8 characters' : 'Enter your password'
+              confirm ? 'At least 6 characters' : 'Enter your password'
             "
             required
             class="password-input"
@@ -83,21 +83,46 @@
 
       <!-- Password Requirements Checklist (Only shown during setup) -->
       <div class="requirements-box" v-if="confirm">
-        <span class="requirements-title">Password must include:</span>
+        <span class="requirements-title">Password must include all of these:</span>
         <ul class="requirements-list">
           <li :class="{ met: hasMinLength }">
             <Icon
               :name="hasMinLength ? 'lucide:check-circle-2' : 'lucide:circle'"
               size="14"
             />
-            <span>At least 8 characters long</span>
+            <span>At least 6 characters</span>
           </li>
-          <li :class="{ met: hasNumberOrSymbol }">
+          <li :class="{ met: hasUppercase }">
+            <Icon
+              :name="hasUppercase ? 'lucide:check-circle-2' : 'lucide:circle'"
+              size="14"
+            />
+            <span>At least one uppercase letter (A-Z)</span>
+          </li>
+          <li :class="{ met: hasLowercase }">
+            <Icon
+              :name="hasLowercase ? 'lucide:check-circle-2' : 'lucide:circle'"
+              size="14"
+            />
+            <span>At least one lowercase letter (a-z)</span>
+          </li>
+          <li :class="{ met: hasNumber }">
             <Icon
               :name="hasNumber ? 'lucide:check-circle-2' : 'lucide:circle'"
               size="14"
             />
-            <span>At least one number or symbol</span>
+            <span>At least one number (0-9)</span>
+          </li>
+          <li :class="{ met: hasSpecialCharacter }">
+            <Icon
+              :name="
+                hasSpecialCharacter
+                  ? 'lucide:check-circle-2'
+                  : 'lucide:circle'
+              "
+              size="14"
+            />
+            <span>At least one special character (e.g. !, @, #)</span>
           </li>
           <li :class="{ met: passwordsMatch && password.length > 0 }">
             <Icon
@@ -156,10 +181,6 @@ const hasUppercase = computed(() => /[A-Z]/.test(password.value));
 const hasLowercase = computed(() => /[a-z]/.test(password.value));
 
 const hasNumber = computed(() => /\d/.test(password.value));
-
-const hasNumberOrSymbol = computed(
-  () => /\d/.test(password.value) || /[^A-Za-z0-9]/.test(password.value),
-);
 
 const hasSpecialCharacter = computed(() => /[^A-Za-z0-9]/.test(password.value));
 

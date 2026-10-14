@@ -194,7 +194,7 @@ const copyReference = async () => {
 };
 
 const downloadConfirmation = () => {
-  alert("Downloading official HostelFlow booking confirmation document...");
+  $toast.info("coming soon...");
 };
 
 const handleCancelBooking = async (bookingId) => {

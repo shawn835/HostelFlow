@@ -30,7 +30,11 @@
         </div>
 
         <!-- 2 inputs: confirm prop set to true -->
-        <PasswordForm :confirm="true" @submit-password="handlePasswordSetup" />
+        <PasswordForm
+          :confirm="true"
+          @submit-password="handlePasswordSetup"
+          :isSubmitting="isSubmitting"
+        />
       </div>
     </div>
   </div>

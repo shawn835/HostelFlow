@@ -53,7 +53,7 @@
       </div>
 
       <!-- Account Security Section -->
-      <div class="section-group">
+      <!-- <div class="section-group">
         <h3 class="group-heading">Account Security</h3>
         <div class="info-card action-card" @click="changePassword">
           <div class="action-card-content">
@@ -66,7 +66,7 @@
             /></span>
           </div>
         </div>
-      </div>
+      </div> -->
 
       <!-- Account Details Section -->
       <div class="section-group">
